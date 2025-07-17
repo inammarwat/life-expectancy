@@ -2,5 +2,16 @@
 title: "Life Expectancy for Political Candidates"
 author: "Inam Khan"
 format: html
+execute: 
+  echo: false
+  message: false
+  warning: false
 ---
+
+```{r}
+library(tidyverse)
+library(primer.data)
+```
+
+Serving as a political candidate can take a toll on one’s health and longevity. Drawing on data from more than 1,000 gubernatorial candidates in the U.S. since 1945, this analysis builds a model to predict how long such individuals live after running for office.
 
