@@ -14,6 +14,7 @@ library(primer.data)
 library(tidymodels)
 library(broom)
 library(gt) 
+library(marginaleffects)
 ```
 
 ```{r}
@@ -21,7 +22,40 @@ x <- governors |>
     select(lived_after, sex, election_age)
 ```
 
-Serving as a political candidate can take a toll on one’s health and longevity. Drawing on data from more than 1,000 gubernatorial candidates in the U.S. since 1945, this analysis builds a model to predict how long such individuals live after running for office. However, our model may be limited by the fact that candidates for mayor may not be representative of other political offices, raising concerns about representativeness.
+```{r}
+#| cache: true
+fit_years <- linear_reg(engine = "lm") |> 
+  fit(lived_after ~ sex + election_age, data = x)
+```
+
+```{r}
+library(ggplot2)
+
+predictions <- x %>%
+  mutate(.pred = predict(fit_years, new_data = x)$.pred)
+
+ggplot(predictions, aes(x = election_age, y = .pred, color = sex)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "loess", se = FALSE, linewidth = 1.2) +
+  labs(
+    title = "Predicted Years Lived After Election by Age and Sex",
+    subtitle = "Male longevity declines sharply with age; female longevity remains mostly stable",
+    x = "Age at Election",
+    y = "Predicted Years Lived After Election",
+    color = "Sex",
+    caption = "Source: Preceptor’s Primer Political Candidates Dataset"
+  ) +
+  scale_color_manual(values = c("Female" = "#d95f02", "Male" = "#1b9e77")) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12),
+    plot.caption = element_text(size = 10, face = "italic"),
+    legend.position = "right"
+  )
+```
+
+Serving as a political candidate can take a toll on one’s health and longevity. Drawing on data from more than 1,000 gubernatorial candidates in the U.S. since 1945, this analysis builds a model to predict how long such individuals live after running for office. We model expected years lived after the last election—a measure of longevity—as a linear function of age at the time of election and sex. However, our model may be limited by the fact that candidates for mayor may not be representative of other political offices, raising concerns about representativeness. For example, a male candidate who runs for office at age 60 is predicted to live approximately 22 more years, with a 95% confidence interval ranging from about 19 to 25 years.
 
 $$
 Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon
@@ -33,11 +67,7 @@ $$
 \hat{Y}_i = 66.00 + 6.21 \cdot \text{sex}_{\text{Male},i} - 0.85 \cdot \text{election\_age}_i
 $$
 
-```{r}
-#| cache: true
-fit_years <- linear_reg(engine = "lm") |> 
-  fit(lived_after ~ sex + election_age, data = x)
-```
+
 
 
 ```{r}
