@@ -13,6 +13,12 @@ library(tidyverse)
 library(primer.data)
 library(tidymodels)
 library(broom)
+library(gt) 
+```
+
+```{r}
+x <- governors |>
+    select(lived_after, sex, election_age)
 ```
 
 Serving as a political candidate can take a toll on one’s health and longevity. Drawing on data from more than 1,000 gubernatorial candidates in the U.S. since 1945, this analysis builds a model to predict how long such individuals live after running for office. However, our model may be limited by the fact that candidates for mayor may not be representative of other political offices, raising concerns about representativeness.
@@ -22,3 +28,31 @@ Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon
 $$
 
 with $\epsilon \sim \mathcal{N}(0, \sigma^2)$.
+
+$$
+\hat{Y}_i = 66.00 + 6.21 \cdot \text{sex}_{\text{Male},i} - 0.85 \cdot \text{election\_age}_i
+$$
+
+```{r}
+#| cache: true
+fit_years <- linear_reg(engine = "lm") |> 
+  fit(lived_after ~ sex + election_age, data = x)
+```
+
+
+```{r}
+#| cache: true
+tidy(fit_years, conf.int = TRUE) |>
+  select(term, estimate, conf.low, conf.high) |>
+  gt() |>
+  fmt_number(columns = c(estimate, conf.low, conf.high), decimals = 2) |>
+  cols_label(
+    term = "Variable",
+    estimate = "Estimate",
+    conf.low = "Lower 95% CI",
+    conf.high = "Upper 95% CI"
+  ) |>
+  tab_header(
+    title = "Model Coefficients with 95% Confidence Intervals"
+  )
+```
