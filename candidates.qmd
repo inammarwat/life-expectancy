@@ -11,7 +11,14 @@ execute:
 ```{r}
 library(tidyverse)
 library(primer.data)
+library(tidymodels)
+library(broom)
 ```
 
-Serving as a political candidate can take a toll on one’s health and longevity. Drawing on data from more than 1,000 gubernatorial candidates in the U.S. since 1945, this analysis builds a model to predict how long such individuals live after running for office.
+Serving as a political candidate can take a toll on one’s health and longevity. Drawing on data from more than 1,000 gubernatorial candidates in the U.S. since 1945, this analysis builds a model to predict how long such individuals live after running for office. However, our model may be limited by the fact that candidates for mayor may not be representative of other political offices, raising concerns about representativeness.
 
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon
+$$
+
+with $\epsilon \sim \mathcal{N}(0, \sigma^2)$.
